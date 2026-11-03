@@ -1,0 +1,22 @@
+{
+    // Use the project venv for Python files, notebooks and new terminals
+    "python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+    "python.terminal.activateEnvironment": true,
+    "python.envFile": "${workspaceFolder}\\.env",
+    "jupyter.notebookFileRoot": "${workspaceFolder}",
+
+    // SQL Server (Docker) connection for the MSSQL extension — password is asked on first connect
+    "mssql.connections": [
+        {
+            "profileName": "M_A Docker (RetailUZ)",
+            "server": "localhost,14333",
+            "database": "RetailUZ",
+            "authenticationType": "SqlLogin",
+            "user": "sa",
+            "password": "",
+            "savePassword": true,
+            "trustServerCertificate": true,
+            "encrypt": "Mandatory"
+        }
+    ]
+}
