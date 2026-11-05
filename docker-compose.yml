@@ -45,5 +45,33 @@ services:
     entrypoint: ["/bin/bash", "-c", "for f in /sql/init/*.sql; do echo \"running $$f\"; /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -b -i \"$$f\" || exit 1; done; echo INIT_DONE"]
     restart: "no"
 
+  clickhouse:
+    build: ./docker/clickhouse            # clickhouse-server:25.8 + ODBC Driver 18 + odbc-bridge
+    image: m_a/clickhouse-odbc:25.8
+    container_name: ma_clickhouse
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB}
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}   # used by odbc() load script (sql/clickhouse/03_*.sql)
+    ports:
+      - "${CLICKHOUSE_HTTP_PORT:-8123}:8123"   # HTTP + Play UI
+      - "${CLICKHOUSE_TCP_PORT:-9000}:9000"    # native protocol
+    ulimits:
+      nofile: { soft: 262144, hard: 262144 }
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      - ./data:/data
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
 volumes:
   mssql_data:
+  clickhouse_data:  

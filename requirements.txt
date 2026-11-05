@@ -6,3 +6,4 @@ jupyterlab>=4.2
 ipykernel>=6.29
 matplotlib>=3.8
 openpyxl>=3.1
+clickhouse-connect>=0.8
